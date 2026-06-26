@@ -1,12 +1,12 @@
 #ifndef MAIN_HDR_GUARD
 #define MAIN_HDR_GUARD
 
-/* External library headers */
-//#include <curses.h>
-#include <curses.h> 
+struct Player {
+    int x;
+    int y;
+};
+struct State {
+    struct Player p;
+};
 
-/* C standard library headers */
-#include <stdio.h>
-
-//End C standard library headers
-#endif
+#endif //MAIN_HDR_GUARD

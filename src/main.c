@@ -1,32 +1,51 @@
+/* Colton Beckstead - 2026
+ * Entry point for the program.
+ * This file should not contain significant logic: game loop functions
+ * should be outsourced to game.c (TODO) or other locations.
+ *
+ * Handling of command line arguments, initialization, and shutdown of
+ * resources can all happen here.
+ */
+
+
+/* C standard library headers */
+#include <stdio.h>
+#include <stdlib.h>
+//End C standard library headers
+
 #include "main.h"
+#include "display.h" //display_ functions
 
-int main() {
-	initscr();	//the master init for curses
-	noecho(); 	//don't echo user input to screen
-	cbreak();	//unbuffered input, C-c and C-z retained
-	keypad(stdscr, true);	//enable numpad and fn keys
-	curs_set(1);	//set cursor to normal
+//currently unused - TODO - set screen height and width manually
+#define SCREEN_HEIGHT 50
+#define SCREEN_WIDTH 80
 
-	if (has_colors() == false) {
-		endwin();
-		printf("%s\n", "Your terminal doesn't support colors");
-		return 1;
-	}
 
-	start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLUE); //background and foreground colors
-	attron(COLOR_PAIR(1));
-	int x, y;
-	getmaxyx(stdscr, y, x);
-	y *= (int) 0.5;
-	x = x * (int) 0.5 - 6;
-	mvprintw(y, x, "Hello, world!");
-	mvprintw(2, 2, "Hello, world!");
-	refresh();
+bool game_loop(struct State *);
 
-	attroff(COLOR_PAIR(1));
+int main()
+{
+	display_libraries_init();
+    struct State gamestate;
+    display_getmaxyx(&gamestate.p.y, &gamestate.p.x);
+    //getmaxyx(stdscr, gamestate.p.y, gamestate.p.x);
+    gamestate.p.y >>= 1;
+    gamestate.p.x >>= 1;
+	do {
+		//code to run once per game cycle here
+	} while ( game_loop(&gamestate) );
 
-	getch();	//pause before exit
-	endwin();	//ncurses cleanup
+	display_libraries_end();
 	return 0;
+}
+bool game_loop(struct State *s)
+{
+	bool should_continue = false;
+
+    display_mvprintw(s->p.y, s->p.x, "@");
+	display_refresh();
+
+	display_getch();	//pause before exit
+
+	return should_continue;
 }
