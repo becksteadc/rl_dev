@@ -1,4 +1,7 @@
 *.o
 *.ignore
 *.exe
+*.swp
+objs/
+build/
 game
