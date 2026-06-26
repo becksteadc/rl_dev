@@ -1,11 +1,17 @@
-/* Defines enum values useful for mapping platform-dependant code constants to
- * internal constants for each key type. Note that for the basic alphanumeric
- * keys, and even basic symbols, comparing to the char. value instead is allowed.
- */
-
-
 #ifndef INPUT_H
 #define INPUT_H
+
+enum Input_Result {
+    IR_NONE,
+    IR_QUIT, // Signals that the program should clean up and exit normally (user quit)
+    // ...TODO - make more as needed - things that can't be handled
+    // by input.c alone. There should not be many here.
+};
+
+
+#include "main.h"
+
+enum Input_Result input_handle_keystroke(struct State *s, int key);
 
 //Prefixing every enum value with 'g' - think "game_key_up" for example
 //This is to separate it from the curses naming of gKEY_UP, etc. ("Library" enums vs "game" ones.
@@ -91,10 +97,12 @@ enum {
     gKEY_RIGHT_CURLY_BRACE = '}', // }
     gKEY_LEFT_BRACKET = '[', // [
     gKEY_RIGHT_BRACKET = ']', // ]
-    gKEY_TILDE '~',
+    gKEY_TILDE = '~',
     gKEY_BACK_TICK = '`',
     gKEY_PIPE = '|', // |
     gKEY_PERIOD = '.',
     gKEY_CARROT = '^', // ^
 };
-#endif //INPUT_H
+
+
+#endif

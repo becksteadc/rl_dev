@@ -15,6 +15,7 @@
 
 #include "display.h"
 #include "error.h"
+#include "platform_input.h"
 #include <curses.h>
 void exit(int); //No need to include stdlib just for this one function declaration.
 int display_errno = 0;
@@ -69,5 +70,5 @@ void display_refresh(void)
 
 int display_getch(void)
 {
-    return input_map_keystroke(getch());
+    return platform_input_map_keystroke(getch());
 }

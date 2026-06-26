@@ -15,6 +15,7 @@
 
 #include "main.h"
 #include "display.h" //display_ functions
+#include "input.h"
 
 //currently unused - TODO - set screen height and width manually
 #define SCREEN_HEIGHT 50
@@ -40,12 +41,15 @@ int main()
 }
 bool game_loop(struct State *s)
 {
-	bool should_continue = false;
+	bool should_continue = true;
 
     display_mvprintw(s->p.y, s->p.x, "@");
 	display_refresh();
 
-	display_getch();	//pause before exit
+	const int keystroke = display_getch();	//pause before exit
+    //if (input == 'q' || input == 'Q') should_continue = false;
+    enum Input_Result key_result = input_handle_keystroke(s, keystroke);
+    if (key_result == IR_QUIT) should_continue = false;
 
 	return should_continue;
 }
