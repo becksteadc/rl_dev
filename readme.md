@@ -1,9 +1,9 @@
-##### Some RL tinkering
-- Using pdcurses this time around
-- keep it simple
+###### Yet another experimental roguelike.
 
-PDCurses documentation: https://pdcurses.org/
-PDCurses is in the public domain; its use is acknowledged.
+Currently depends on PDCurses (ncurses should suffice).
 
-Also of help for the initial tinkering was this article:
-https://hackaday.com/2025/06/17/a-gentle-introduction-to-ncurses-for-the-terminally-impatient/
+###### Compiling:
+Run make. The makefile is not very well made though, so if you run into errors,
+you may have to just compile everything together.
+
+A more robust build setup is needed, but hasn't been a priority yet.
