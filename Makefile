@@ -1,38 +1,47 @@
 CC=gcc
-OBJS=main.o display.o input.o platform_input.o
-SRC=main.c
 SRC_DIR=src
 OBJ_DIR=objs
+OBJS=$(OBJ_DIR)/main.o $(OBJ_DIR)/display.o $(OBJ_DIR)/input.o $(OBJ_DIR)/platform_input.o \
+	 $(OBJ_DIR)/player.o
 COMPILE_OPTS=-Wall -Wextra -Werror -Wshadow -Wconversion -Wunreachable-code
 LINKER_OPTS=-lcurses
+
+# TODO / hack: have to specify the build target manually... in the makefile...
+COMPILE_OPTS += -DBUILD_CURSES
 
 # Use this instead of CC directly
 BUILD=$(CC) $(LINKER_OPTS) $(COMPILE_OPTS)
 
-all:
-	$(info Specify a backend to build for. Currently supported:)
-	$(info curses (run "make curses"))
+all: build/game
+	$(info Running curses build by default)
+	$(info Currently supported target platforms: curses)
+
+build/game: curses
+	cp game build/game
 
 clean:
 	rm -f $(OBJ_DIR)/*.o
 	rm -f game build/game
 	rm -f $(OBJ_DIR)/curses/*.o
 
-curses: $(OBJS) $(OBJ_DIR)/curses game
+curses: $(OBJS) $(OBJ_DIR)/curses
 	$(BUILD) -o game $(OBJ_DIR)/curses/*.o $(OBJ_DIR)/*.o
 
 $(OBJ_DIR)/curses:
 	mkdir $(OBJ_DIR)/curses
 
-main.o: $(SRC_DIR)/game_layer/main.c
+$(OBJ_DIR)/main.o: $(SRC_DIR)/game_layer/main.c $(SRC_DIR)/game_layer/main.h
 	# "Game layer" object: output directly into $(OBJ_DIR)
 	$(BUILD) -o $(OBJ_DIR)/main.o -c $(SRC_DIR)/game_layer/main.c
 
-display.o: $(SRC_DIR)/platform_curses/display.c
+$(OBJ_DIR)/display.o: $(SRC_DIR)/platform_curses/display.c $(SRC_DIR)/platform_curses/display.h
 	$(BUILD) -c -o $(OBJ_DIR)/display.o $(SRC_DIR)/platform_curses/display.c
 
-platform_input.o: $(SRC_DIR)/translation_curses/platform_input.c $(SRC_DIR)/translation_curses/platform_input.h
+$(OBJ_DIR)/platform_input.o: $(SRC_DIR)/translation_curses/platform_input.c $(SRC_DIR)/translation_curses/platform_input.h
 	$(BUILD) -c -o $(OBJ_DIR)/curses/platform_input.o $(SRC_DIR)/translation_curses/platform_input.c
 
-input.o: $(SRC_DIR)/game_layer/input.c $(SRC_DIR)/game_layer/input.h
+$(OBJ_DIR)/input.o: $(SRC_DIR)/game_layer/input.c $(SRC_DIR)/game_layer/input.h
 	$(BUILD) -c -o $(OBJ_DIR)/input.o $(SRC_DIR)/game_layer/input.c
+
+$(OBJ_DIR)/player.o: $(SRC_DIR)/game_layer/player.c $(SRC_DIR)/game_layer/player.h
+	$(BUILD) -c -o $(OBJ_DIR)/player.o $(SRC_DIR)/game_layer/player.c

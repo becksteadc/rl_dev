@@ -14,7 +14,7 @@
 
 #include <curses.h>
 #include "platform_input.h"
-#include "input.h"
+#include "../game_layer/input.h"
 
 int platform_input_map_keystroke(int key)
 {
@@ -27,6 +27,14 @@ int platform_input_map_keystroke(int key)
         return gKEY_LEFT;
     case KEY_RIGHT:
         return gKEY_RIGHT;
+    case KEY_A1: //upper left of keypad: (numpad 7)
+        return gKEY_NUMPAD_7;
+    case KEY_A3:
+        return gKEY_NUMPAD_9;
+    case KEY_C1:
+        return gKEY_NUMPAD_1;
+    case KEY_C3:
+        return gKEY_NUMPAD_3;
     default:
         return key;
     }

@@ -11,11 +11,14 @@
 /* C standard library headers */
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 //End C standard library headers
 
 #include "main.h"
-#include "display.h" //display_ functions
+#include "platform_includes.h"
+//#include "display.h" //display_ functions
 #include "input.h"
+#include "player.h" //for enum Move_Direction
 
 //currently unused - TODO - set screen height and width manually
 #define SCREEN_HEIGHT 50
@@ -48,8 +51,16 @@ bool game_loop(struct State *s)
 
 	const int keystroke = display_getch();	//pause before exit
     //if (input == 'q' || input == 'Q') should_continue = false;
-    enum Input_Result key_result = input_handle_keystroke(s, keystroke);
+    enum Input_Result key_result = input_handle_keystroke(keystroke);
     if (key_result == IR_QUIT) should_continue = false;
+    else if (key_result == IR_MOVE) {
+        enum Move_Direction md = player_keypress_to_move(keystroke);
+        //fprintf(stderr, "md=%d\n", (int) md);
+        if (md != MV_INVALID) player_move(&(s->p), md);
+    } else if (key_result == IR_NONE) { ; }
+    else {
+        assert(0); //ERROR! Unhandled Input_Result option.
+    }
 
 	return should_continue;
 }

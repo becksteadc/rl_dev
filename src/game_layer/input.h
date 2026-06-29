@@ -4,6 +4,7 @@
 enum Input_Result {
     IR_NONE,
     IR_QUIT, // Signals that the program should clean up and exit normally (user quit)
+    IR_MOVE,
     // ...TODO - make more as needed - things that can't be handled
     // by input.c alone. There should not be many here.
 };
@@ -11,7 +12,7 @@ enum Input_Result {
 
 #include "main.h"
 
-enum Input_Result input_handle_keystroke(struct State *s, int key);
+enum Input_Result input_handle_keystroke(int key);
 
 //Prefixing every enum value with 'g' - think "game_key_up" for example
 //This is to separate it from the curses naming of gKEY_UP, etc. ("Library" enums vs "game" ones.
@@ -20,6 +21,11 @@ enum {
     gKEY_DOWN,
     gKEY_LEFT,
     gKEY_RIGHT,
+    gKEY_NUMPAD_1, //hack - just use up, down, left, right for 8, 2, 4, 6 numpads
+    gKEY_NUMPAD_3,
+    gKEY_NUMPAD_7,
+    gKEY_NUMPAD_9,
+    gKEY_NUMPAD_5,
     gKEY_A = 'A',
     gKEY_B = 'B',
     gKEY_C = 'C',

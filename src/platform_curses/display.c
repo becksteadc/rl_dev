@@ -13,9 +13,9 @@
  */
 
 
-#include "../game_layer/display.h"
-#include "error.h"
-#include "platform_input.h"
+#include "display.h"
+#include "../game_layer/error_defs.h"
+#include "../translation_curses/platform_input.h"
 #include <curses.h>
 void exit(int); //No need to include stdlib just for this one function declaration.
 int display_errno = 0;
