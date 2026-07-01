@@ -22,6 +22,14 @@ enum Input_Result input_handle_keystroke(int key)
         case gKEY_LEFT:
             [[fallthrough]];
         case gKEY_RIGHT:
+            [[fallthrough]];
+        case gKEY_NUMPAD_7:
+            [[fallthrough]];
+        case gKEY_NUMPAD_9:
+            [[fallthrough]];
+        case gKEY_NUMPAD_1:
+            [[fallthrough]];
+        case gKEY_NUMPAD_3:
             return IR_MOVE; //NOT fallthrough
         case 'q':
             [[fallthrough]];

@@ -64,7 +64,7 @@ enum Move_Direction player_keypress_to_move(int keypress)
     case gKEY_RIGHT:
         return MV_E;
     case gKEY_NUMPAD_3:
-        return MV_SW;
+        return MV_SE;
     case gKEY_DOWN:
         return MV_S;
     case gKEY_NUMPAD_1:

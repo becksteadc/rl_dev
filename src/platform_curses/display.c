@@ -72,3 +72,9 @@ int display_getch(void)
 {
     return platform_input_map_keystroke(getch());
 }
+
+//Note: currently just assuming stdscr
+enum Error_Type display_resize_window(int y, int x)
+{
+    return (resize_term(y, x) == 0) ? E_DISPLAY : E_OK;
+}

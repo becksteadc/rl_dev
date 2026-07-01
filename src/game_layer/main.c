@@ -31,6 +31,12 @@ int main()
 {
 	display_libraries_init();
     struct State gamestate;
+//    enum Error_Type error_result = display_resize_window(SCREEN_HEIGHT, SCREEN_WIDTH);
+//    if (error_result != E_OK) {
+//        display_libraries_end();
+//        fprintf(stderr, "Failed to resize the window.\n");
+//        return 1;
+//    }
     display_getmaxyx(&gamestate.p.y, &gamestate.p.x);
     //getmaxyx(stdscr, gamestate.p.y, gamestate.p.x);
     gamestate.p.y >>= 1;

@@ -12,30 +12,40 @@
  *
  */
 
-#include <curses.h>
+//#include <curses.h>
+#include "curses.h"
 #include "platform_input.h"
 #include "../game_layer/input.h"
 
 int platform_input_map_keystroke(int key)
 {
     switch (key) {
+    case '8': [[fallthrough]];
     case KEY_UP:
         return gKEY_UP;
+    case '2': [[fallthrough]];
     case KEY_DOWN:
         return gKEY_DOWN;
+    case '4': [[fallthrough]];
     case KEY_LEFT:
         return gKEY_LEFT;
+    case '6': [[fallthrough]];
     case KEY_RIGHT:
         return gKEY_RIGHT;
-    case KEY_A1: //upper left of keypad: (numpad 7)
+    case KEY_A1: [[fallthrough]]; //upper left of keypad: (numpad 7)
+    case '7':
         return gKEY_NUMPAD_7;
-    case KEY_A3:
+    case KEY_A3: [[fallthrough]];
+    case '9':
         return gKEY_NUMPAD_9;
-    case KEY_C1:
+    case KEY_C1: [[fallthrough]];
+    case '1':
         return gKEY_NUMPAD_1;
-    case KEY_C3:
+    case KEY_C3: [[fallthrough]];
+    case '3':
         return gKEY_NUMPAD_3;
     default:
+        //mvprintw(0, 0, "unmapped key: %d\n", key);
         return key;
     }
 }

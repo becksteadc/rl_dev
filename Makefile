@@ -4,7 +4,13 @@ OBJ_DIR=objs
 OBJS=$(OBJ_DIR)/main.o $(OBJ_DIR)/display.o $(OBJ_DIR)/input.o $(OBJ_DIR)/platform_input.o \
 	 $(OBJ_DIR)/player.o
 COMPILE_OPTS=-Wall -Wextra -Werror -Wshadow -Wconversion -Wunreachable-code
-LINKER_OPTS=-lcurses
+
+#To compile with PDCurses... \/
+#LINKER_OPTS=-lpdcurses2 -lSDL2
+#To compile with curses instead of PDCurses...
+#LINKER_OPTS=-lcurses
+#To compile with ncurses instead...
+LINKER_OPTS=-lncurses
 
 # TODO / hack: have to specify the build target manually... in the makefile...
 COMPILE_OPTS += -DBUILD_CURSES
