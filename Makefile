@@ -1,8 +1,12 @@
+# WARNING: this makefile is badly written
+# It currently doesn't include headers as dependencies properly
+# If you change any headers, it's best to make clean before building again.
+
 CC=gcc
 SRC_DIR=src
 OBJ_DIR=objs
 OBJS=$(OBJ_DIR)/main.o $(OBJ_DIR)/display.o $(OBJ_DIR)/input.o $(OBJ_DIR)/platform_input.o \
-	 $(OBJ_DIR)/player.o
+	 $(OBJ_DIR)/player.o $(OBJ_DIR)/dungeon.o
 COMPILE_OPTS=-Wall -Wextra -Werror -Wshadow -Wconversion -Wunreachable-code
 
 #To compile with PDCurses... \/
@@ -51,3 +55,6 @@ $(OBJ_DIR)/input.o: $(SRC_DIR)/game_layer/input.c $(SRC_DIR)/game_layer/input.h
 
 $(OBJ_DIR)/player.o: $(SRC_DIR)/game_layer/player.c $(SRC_DIR)/game_layer/player.h
 	$(BUILD) -c -o $(OBJ_DIR)/player.o $(SRC_DIR)/game_layer/player.c
+
+$(OBJ_DIR)/dungeon.o: $(SRC_DIR)/game_layer/dungeon.c $(SRC_DIR)/game_layer/dungeon.h
+	$(BUILD) -c -o $(OBJ_DIR)/dungeon.o $(SRC_DIR)/game_layer/dungeon.c

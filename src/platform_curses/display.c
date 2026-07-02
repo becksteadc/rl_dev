@@ -60,7 +60,14 @@ int display_mvprintw(int y, int x, char *str)
 {
     const int val = mvprintw(y, x, str);
     if (val == ERR) return E_DISPLAY;
-    return 0; //success
+    return E_OK; //success
+}
+
+enum Error_Type display_mvinsch(int y, int x, unsigned int c)
+{
+	const int val = mvinsch(y, x, c);
+	if (val == ERR) return E_DISPLAY;
+	else return E_OK;
 }
 
 void display_refresh(void)

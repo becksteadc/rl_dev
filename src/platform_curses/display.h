@@ -15,6 +15,7 @@ void display_libraries_init(void);
 void display_libraries_end(void);
 void display_getmaxyx(int *y, int *x);
 int display_mvprintw(int y, int x, char *str);
+enum Error_Type display_mvinsch(int y, int x, unsigned int c);
 void display_refresh(void);
 int display_getch(void);
 enum Error_Type display_resize_window(int y, int x);

@@ -19,6 +19,7 @@
 //#include "display.h" //display_ functions
 #include "input.h"
 #include "player.h" //for enum Move_Direction
+#include "dungeon.h"
 
 //currently unused - TODO - set screen height and width manually
 #define SCREEN_HEIGHT 50
@@ -37,6 +38,18 @@ int main()
 //        fprintf(stderr, "Failed to resize the window.\n");
 //        return 1;
 //    }
+	struct Dungeon_Context dungeon_state = {
+		.width = 80,
+		.height = 50,
+	};
+	enum Error_Type error_result = dungeon_generate(&dungeon_state);
+	if (error_result != E_OK) {
+		display_libraries_end();
+		fprintf(stderr, "Failed to generate dungeon properly.\n");
+		return 1;
+	}
+
+	dungeon_display(&dungeon_state);
     display_getmaxyx(&gamestate.p.y, &gamestate.p.x);
     //getmaxyx(stdscr, gamestate.p.y, gamestate.p.x);
     gamestate.p.y >>= 1;
