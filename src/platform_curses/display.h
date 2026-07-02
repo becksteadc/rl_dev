@@ -19,5 +19,6 @@ enum Error_Type display_mvinsch(int y, int x, unsigned int c);
 void display_refresh(void);
 int display_getch(void);
 enum Error_Type display_resize_window(int y, int x);
+enum Error_Type display_mvdelch(int y, int x);
 
 #endif //DISPLAY_H

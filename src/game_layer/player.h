@@ -1,7 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-
-#include "main.h" //Needed for struct Player
+#include <stdint.h>
+#include "dungeon.h"
+//#include "main.h" //no longer needed for struct Player
+struct Player {
+    uint16_t x;
+    uint16_t y;
+};
 
 enum Move_Direction {
     MV_N = 8, //"move north"
@@ -15,7 +20,7 @@ enum Move_Direction {
     MV_INVALID = 99,
 };
 
-int player_move(struct Player *p, enum Move_Direction d);
+int player_move(struct Player *p, struct Dungeon_Context *c, enum Move_Direction d);
 enum Move_Direction player_keypress_to_move(int keypress);
 
 #endif //PLAYER_H

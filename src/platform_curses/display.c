@@ -83,5 +83,10 @@ int display_getch(void)
 //Note: currently just assuming stdscr
 enum Error_Type display_resize_window(int y, int x)
 {
-    return (resize_term(y, x) == 0) ? E_DISPLAY : E_OK;
+    return (resize_term(y, x) == OK) ? E_DISPLAY : E_OK;
+}
+
+enum Error_Type display_mvdelch(int y, int x)
+{
+    return (mvdelch(y, x) == OK) ? E_DISPLAY : E_OK;
 }

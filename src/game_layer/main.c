@@ -18,42 +18,30 @@
 #include "platform_includes.h"
 //#include "display.h" //display_ functions
 #include "input.h"
-#include "player.h" //for enum Move_Direction
-#include "dungeon.h"
 
 //currently unused - TODO - set screen height and width manually
 #define SCREEN_HEIGHT 50
 #define SCREEN_WIDTH 80
 
 
-bool game_loop(struct State *);
-
 int main()
 {
 	display_libraries_init();
     struct State gamestate;
-//    enum Error_Type error_result = display_resize_window(SCREEN_HEIGHT, SCREEN_WIDTH);
-//    if (error_result != E_OK) {
-//        display_libraries_end();
-//        fprintf(stderr, "Failed to resize the window.\n");
-//        return 1;
-//    }
-	struct Dungeon_Context dungeon_state = {
+	gamestate.dungeon_state = (struct Dungeon_Context){
 		.width = 80,
 		.height = 50,
 	};
-	enum Error_Type error_result = dungeon_generate(&dungeon_state);
+	enum Error_Type error_result = dungeon_generate(&gamestate.dungeon_state);
 	if (error_result != E_OK) {
 		display_libraries_end();
 		fprintf(stderr, "Failed to generate dungeon properly.\n");
 		return 1;
 	}
 
-	dungeon_display(&dungeon_state);
-    display_getmaxyx(&gamestate.p.y, &gamestate.p.x);
-    //getmaxyx(stdscr, gamestate.p.y, gamestate.p.x);
-    gamestate.p.y >>= 1;
-    gamestate.p.x >>= 1;
+	dungeon_display(&gamestate.dungeon_state);
+	gamestate.player.y = (gamestate.dungeon_state.height >> 1);
+	gamestate.player.x = (gamestate.dungeon_state.width >> 1);
 	do {
 		//code to run once per game cycle here
 	} while ( game_loop(&gamestate) );
@@ -61,11 +49,12 @@ int main()
 	display_libraries_end();
 	return 0;
 }
+
 bool game_loop(struct State *s)
 {
 	bool should_continue = true;
 
-    display_mvprintw(s->p.y, s->p.x, "@");
+    display_mvprintw(s->player.y, s->player.x, "@");
 	display_refresh();
 
 	const int keystroke = display_getch();	//pause before exit
@@ -75,7 +64,7 @@ bool game_loop(struct State *s)
     else if (key_result == IR_MOVE) {
         enum Move_Direction md = player_keypress_to_move(keystroke);
         //fprintf(stderr, "md=%d\n", (int) md);
-        if (md != MV_INVALID) player_move(&(s->p), md);
+        if (md != MV_INVALID) player_move(&(s->player), &(s->dungeon_state), md);
     } else if (key_result == IR_NONE) { ; }
     else {
         assert(0); //ERROR! Unhandled Input_Result option.

@@ -48,5 +48,6 @@ struct Dungeon_Context {
 enum Error_Type dungeon_generate(struct Dungeon_Context *c);
 void dungeon_display(struct Dungeon_Context *c);
 void dungeon_dealloc(struct Dungeon_Context *c);
+uint32_t dungeon_yx_to_offset(struct Dungeon_Context *c, uint16_t y, uint16_t x);
 
 #endif //DUNGEON_H

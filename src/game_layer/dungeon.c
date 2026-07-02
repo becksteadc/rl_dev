@@ -41,3 +41,12 @@ void dungeon_dealloc(struct Dungeon_Context *c)
 {
 	free(c->tile_array);
 }
+
+uint32_t dungeon_yx_to_offset(struct Dungeon_Context *c, uint16_t y, uint16_t x)
+{
+	uint32_t res = y;
+	res *= c->width;
+	res += x;
+	return res;
+	//return y * c->width + x;
+}

@@ -2,6 +2,7 @@
 #include "player.h"
 #include "input.h"
 #include "platform_includes.h"
+#include "dungeon.h"
 
 //Updates the player coordinates based on a move direction.
 //For now (until a display handling refactor is done) writes a
@@ -12,10 +13,10 @@
 //
 //The int return value is for later: when terrain is added, the player may
 //have to "fail" to move. This can be indicated by a nonzero return value.
-int player_move(struct Player *p, enum Move_Direction d)
+int player_move(struct Player *p, struct Dungeon_Context *c, enum Move_Direction d)
 {
-    const int old_x = p->x;
-    const int old_y = p->y;
+    const uint16_t old_x = p->x;
+    const uint16_t old_y = p->y;
     switch(d) {
     case MV_N:
         p->y -= 1;
@@ -48,7 +49,10 @@ int player_move(struct Player *p, enum Move_Direction d)
     default:
         assert(0); //Should be unreachable - an improper enum input.
     }
-    display_mvprintw(old_y, old_x, " ");
+	//uint8_t hack[2] = {(dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol, '\0'};
+	//display_mvprintw(old_y, old_x, (char *) hack);
+    display_mvinsch(old_y, old_x, (dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol);
+	display_mvdelch(old_y, old_x + 1); //HACK
     //let the caller refresh rather than doing so here - they may have more cached
     //updates to do
     return 0;
