@@ -15,6 +15,7 @@ enum Error_Type {
     E_DISPLAY, //An unspecified display error occurred - display_errno
     E_FATAL, //Unspecified fatal error that should terminate the application safely fatal_errno
     E_OS, //Errors returned by the OS or C standard library (Check errno)
+	E_UNIMPLEMENTED,
 
 };
 

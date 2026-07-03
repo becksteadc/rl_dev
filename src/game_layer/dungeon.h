@@ -5,11 +5,14 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 #include "../platform_curses/display.h"
 #include "error_defs.h"
 
 #define DUNGEON_MAX_WIDTH 1024
 #define DUNGEON_MAX_HEIGHT 512
+#define PLACEMENT_MAX_ATTEMPTS 20
+#define PLACEMENT_MAX_ROOMS 5
 
 enum Dungeon_Type {
     MORIA_TRADITIONAL, //Mostly square rooms (maybe eventually support limited special - tile vaults...)
@@ -48,10 +51,27 @@ struct Dungeon_Context {
     union Tile_Type *tile_array; //populated by dungeon generation functions
 }; //TODO - add more fields to the context as needed.
 
+//The max number of connections to other rooms a single room may have.
+//16 is probably overkill
+//#define DUNGEON_NODE_MAX_CONNS 16
+//#define DUNGEON_MAX_NODES 64
+//#define DUNGEON_NODE_NO_CONN 255
+//struct Dungeon_Build_Graph {
+//	uint8_t node_count;
+//	//Store edges as adjacency list, or adjacency matrix?
+//	//List is probably more efficient for this use case.
+//	uint8_t node_connections[DUNGEON_MAX_NODES][DUNGEON_NODE_MAX_CONNS];
+//
+//	
+//
+//}
 
 enum Error_Type dungeon_generate(struct Dungeon_Context *c);
+enum Error_Type dungeon_gen_rooms(struct Dungeon_Context *c, enum Dungeon_Type dt);
+enum Error_Type dungeon_gen_blankslate(struct Dungeon_Context *c);
 void dungeon_display(struct Dungeon_Context *c);
 void dungeon_dealloc(struct Dungeon_Context *c);
 uint32_t dungeon_yx_to_offset(struct Dungeon_Context *c, uint16_t y, uint16_t x);
+enum Error_Type dungeon_place_moria_room(struct Dungeon_Context *c);
 
 #endif //DUNGEON_H
