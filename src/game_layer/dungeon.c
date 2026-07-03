@@ -20,7 +20,17 @@ enum Error_Type dungeon_generate(struct Dungeon_Context *c)
 	};
 	//memset(c->tile_array, blank_floor.raw, sizeof(struct Dungeon_Context) * c->width * c->height);
 	for (int i = 0; i < c->height * c->width; ++i) {
-		*(c->tile_array + i) = blank_floor;
+		//if (i % 6 == 0) {
+		if (false) { //NOTE: debug / testing code
+			*(c->tile_array + i) = (union Tile_Type){
+				.flags = FL_NOMOVE,
+				.item = 0,
+				.entity = 0,
+				.symbol = '#',
+			};
+		} else {
+			*(c->tile_array + i) = blank_floor;
+		}
 	}
 
 	//Just generated an empty grid for now. Returning...

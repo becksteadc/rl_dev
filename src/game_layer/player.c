@@ -49,12 +49,19 @@ int player_move(struct Player *p, struct Dungeon_Context *c, enum Move_Direction
     default:
         assert(0); //Should be unreachable - an improper enum input.
     }
-	//uint8_t hack[2] = {(dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol, '\0'};
-	//display_mvprintw(old_y, old_x, (char *) hack);
-    display_mvinsch(old_y, old_x, (dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol);
-	display_mvdelch(old_y, old_x + 1); //HACK
-    //let the caller refresh rather than doing so here - they may have more cached
-    //updates to do
+	if ((dungeon_yx_to_offset(c, p->y, p->x) + c->tile_array)->flags & FL_NOMOVE) {
+		p->y = old_y;
+		p->x = old_x;
+		//TODO - print out a message that there is a wall in the way
+		//TODO - set "free turn" flag, so that this keypress doesn't take player turn
+	} else {
+		//uint8_t hack[2] = {(dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol, '\0'};
+		//display_mvprintw(old_y, old_x, (char *) hack);
+		display_mvinsch(old_y, old_x, (dungeon_yx_to_offset(c, old_y, old_x) + c->tile_array)->symbol);
+		display_mvdelch(old_y, old_x + 1); //HACK
+		//let the caller refresh rather than doing so here - they may have more cached
+		//updates to do
+	}
     return 0;
 }
 

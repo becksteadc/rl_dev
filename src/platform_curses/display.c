@@ -1,8 +1,8 @@
 /* Colton Beckstead - 2026
  *
  * This file handles interfacing with the "platform-dependent" display code,
- * in this case, the curses library. (PDCurses specifically; its licensing is
- * more open, so I chose it.)
+ * in this case, the curses library. 
+ * 
  *
  * The idea is that this file could be swapped out for another display.c / .o
  * file that provides the same functionality, but with a different display frontend

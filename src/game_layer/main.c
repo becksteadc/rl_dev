@@ -46,6 +46,7 @@ int main()
 		//code to run once per game cycle here
 	} while ( game_loop(&gamestate) );
 
+	dungeon_dealloc(&(gamestate.dungeon_state));
 	display_libraries_end();
 	return 0;
 }

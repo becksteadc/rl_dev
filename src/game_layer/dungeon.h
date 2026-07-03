@@ -15,7 +15,11 @@ enum Dungeon_Type {
     MORIA_TRADITIONAL, //Mostly square rooms (maybe eventually support limited special - tile vaults...)
 };
 
-
+enum Dungeon_Flags {
+	FL_NONE, //May not actually be necessary
+	FL_NOMOVE,
+	FL_LIT,
+};
 /* -- Note: commenting this preset section out, since it would cause redefinition linker errors
 //Note: use Preset_Empty instead of hardcoded zero, since
 //"empty" tiles require some fields to be set to be valid.
