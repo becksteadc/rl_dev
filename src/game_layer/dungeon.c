@@ -28,9 +28,43 @@ enum Error_Type dungeon_gen_rooms(struct Dungeon_Context *c, enum Dungeon_Type d
 }
 
 //Might not be the best to go about placing individual rooms like this.
-//How about dungeon_generate_rooms_graph() instead, which creates an abstract
+//How about dungeon_generate_graph() instead, which creates an abstract
 //connected graph of rooms that can be iterated upon until no more can be added?
 
+///Places the completed build graph into the parameter bg
+///NOTE: it might end up being the case that the function can't really fail.
+///In that case, change the return type to void.
+//TODO -- this function is untested, and probably contains bugs.
+void dungeon_generate_graph(struct Dungeon_Build_Graph *bg)
+{
+	bg->node_count = 0;
+	memset(bg->node_connections, 255, sizeof(bg->node_connections)/*DUNGEON_MAX_NODES * DUNGEON_NODE_MAX_CONNS*/);
+	uint8_t current_node;
+	while (bg->node_count < DUNGEON_MAX_NODES) {
+		int i = 0;
+		current_node = (uint8_t) ((bg->node_count == 0) ? 0 : rand() % bg->node_count);
+		for (; bg->node_connections[current_node][i] != 255; ++i) { ; }
+		if (i > DUNGEON_NODE_MAX_CONNS) continue;
+		++(bg->node_count);
+		bg->node_connections[current_node][i] = bg->node_count;
+	}
+	return;
+}
+
+void dungeon_debug_build_graph(struct Dungeon_Build_Graph *bg)
+{
+	for (int i = 0; i < DUNGEON_MAX_NODES; ++i) {
+		int j = 0;
+		fprintf(stdout, "Node %d\n", i);
+		while (bg->node_connections[i][j] != 255) {
+			if (j >= DUNGEON_NODE_MAX_CONNS) {
+				fprintf(stderr, "Overran node max connection limit. Exiting");
+				return;
+			}
+			fprintf(stdout, "\tConnection: %d\n", bg->node_connections[i][j]);
+		}
+	}
+}
 
 //srand must have been previously called. Implicitly coupled to dungeon_generate, which does so
 enum Error_Type dungeon_place_moria_room(struct Dungeon_Context *c)
@@ -65,25 +99,6 @@ enum Error_Type dungeon_place_moria_room(struct Dungeon_Context *c)
 		.item = 0,
 		.entity = 0,
 	};
-//	union Tile_Type wall1 = {
-//		.symbol = '1',
-//		.flags = FL_NOMOVE,
-//		.item = 0,
-//		.entity = 0,
-//	};
-//	union Tile_Type wall2 = {
-//		.symbol = '2',
-//		.flags = FL_NOMOVE,
-//		.item = 0,
-//		.entity = 0,
-//	};
-//	union Tile_Type wall3 = {
-//		.symbol = '3',
-//		.flags = FL_NOMOVE,
-//		.item = 0,
-//		.entity = 0,
-//	};
-
 	for (uint32_t i = start_x; i <= end_x; ++i) {
 		*(c->tile_array + start_y * c->width + i) = wall;
 		*(c->tile_array + end_y * c->width + i) = wall;
