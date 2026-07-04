@@ -5,3 +5,7 @@
 objs/
 build/
 game
+
+.ibuild/
+ib_build
+ib_game
