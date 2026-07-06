@@ -45,19 +45,30 @@ union Tile_Type {
     };
 };
 
+struct Dungeon_Room {
+	uint8_t id;
+	uint16_t tile_ownership_len;
+	uint32_t tile_ownership_offset;
+};
+
+//The max number of connections to other rooms a single room may have.
+//16 is probably overkill ("node" because these are primarily for build graph logic)
+#define DUNGEON_NODE_MAX_CONNS 4
+#define DUNGEON_MAX_NODES 16
+#define DUNGEON_NODE_NO_CONN 255
+
 ///Represents the context for a given dungeon level
+//could make this more efficient with "programming without pointers" / 1st normal form
+//technique, then could serialize the struct bytes directly to and from disk... TODO
+//The direct size of this struct is not super important, as there will only be one in memory
 struct Dungeon_Context {
     enum Dungeon_Type type;
     uint16_t width;
     uint16_t height;
     union Tile_Type *tile_array; //populated by dungeon generation functions
+	struct Dungeon_Room rooms[DUNGEON_MAX_NODES];
 }; //TODO - add more fields to the context as needed.
 
-//The max number of connections to other rooms a single room may have.
-//16 is probably overkill
-#define DUNGEON_NODE_MAX_CONNS 16
-#define DUNGEON_MAX_NODES 64
-#define DUNGEON_NODE_NO_CONN 255
 struct Dungeon_Build_Graph {
 	uint8_t node_count;
 	//Adjacency list for node connections: each entry goes like this:
@@ -68,12 +79,18 @@ struct Dungeon_Build_Graph {
 
 enum Error_Type dungeon_generate(struct Dungeon_Context *c);
 enum Error_Type dungeon_gen_rooms(struct Dungeon_Context *c, enum Dungeon_Type dt);
-enum Error_Type dungeon_gen_blankslate(struct Dungeon_Context *c);
+//enum Error_Type dungeon_gen_blankslate(struct Dungeon_Context *c); //Depreciated by filledslate
 void dungeon_generate_graph(struct Dungeon_Build_Graph *bg);
 void dungeon_display(struct Dungeon_Context *c);
 void dungeon_dealloc(struct Dungeon_Context *c);
 uint32_t dungeon_yx_to_offset(struct Dungeon_Context *c, uint16_t y, uint16_t x);
-enum Error_Type dungeon_place_moria_room(struct Dungeon_Context *c);
 void dungeon_debug_build_graph(struct Dungeon_Build_Graph *bg);
+enum Error_Type dungeon_gen_filledslate(struct Dungeon_Context *c, union Tile_Type fill_tile);
+
+enum Error_Type dungeon_place_moria_room (struct Dungeon_Context *c, uint8_t room_number, uint32_t corner_A_x, uint32_t corner_A_y, uint32_t corner_B_x, uint32_t corner_B_y);
+enum Error_Type dungeon_dump_to_file(struct Dungeon_Context *c, char *filename);
+
+//TODO - this will be moved to another source file
+int weighted_random(uint8_t *weights, uint8_t weight_count);
 
 #endif //DUNGEON_H

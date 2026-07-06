@@ -24,8 +24,24 @@
 #define SCREEN_WIDTH 80
 
 
-int main()
+int main(void)
 {
+//	struct Dungeon_Context throwaway = { .width = 80, .height = 50, };
+//	enum Error_Type test_result = dungeon_generate(&throwaway);
+//	if (error_result != E_OK) { fprintf(stderr, "throwaway err\n"); return 1; }
+
+	struct Dungeon_Build_Graph bg;
+	dungeon_generate_graph(&bg);
+	dungeon_debug_build_graph(&bg);
+
+	//	Weighted random testing nonsense. Can be removed later.
+//	srand((unsigned int) time(NULL));
+//	uint8_t wrand_test[4] = {5, 10, 5, 2};
+//	for (int i = 0; i < 20; ++i) {
+//		printf("wrand=%d\n", weighted_random(wrand_test, 4));
+//	}
+	getchar();
+
 	display_libraries_init();
     struct State gamestate;
 	gamestate.dungeon_state = (struct Dungeon_Context){
@@ -46,6 +62,10 @@ int main()
 		//code to run once per game cycle here
 	} while ( game_loop(&gamestate) );
 
+	if (dungeon_dump_to_file(&(gamestate.dungeon_state), "dungeon_dump.txt.ignore") != E_OK) {
+		display_mvprintw(0, 0, "Failed to dump dungeon to file\n");
+		display_getch();
+	}
 	dungeon_dealloc(&(gamestate.dungeon_state));
 	display_libraries_end();
 	return 0;
