@@ -6,7 +6,7 @@ CC=gcc
 SRC_DIR=src
 OBJ_DIR=objs
 OBJS=$(OBJ_DIR)/main.o $(OBJ_DIR)/display.o $(OBJ_DIR)/input.o $(OBJ_DIR)/platform_input.o \
-	 $(OBJ_DIR)/player.o $(OBJ_DIR)/dungeon.o
+	 $(OBJ_DIR)/player.o $(OBJ_DIR)/dungeon.o $(OBJ_DIR)/log.o
 COMPILE_OPTS=-Wall -Wextra -Werror -Wshadow -Wconversion -Wunreachable-code
 
 #To compile with PDCurses... \/
@@ -58,3 +58,6 @@ $(OBJ_DIR)/player.o: $(SRC_DIR)/game_layer/player.c $(SRC_DIR)/game_layer/player
 
 $(OBJ_DIR)/dungeon.o: $(SRC_DIR)/game_layer/dungeon.c $(SRC_DIR)/game_layer/dungeon.h
 	$(BUILD) -c -o $(OBJ_DIR)/dungeon.o $(SRC_DIR)/game_layer/dungeon.c
+
+$(OBJ_DIR)/log.o: $(SRC_DIR)/game_layer/log.c $(SRC_DIR)/game_layer/log.h
+	$(BUILD) -c -o $(OBJ_DIR)/log.o $(SRC_DIR)/game_layer/log.c

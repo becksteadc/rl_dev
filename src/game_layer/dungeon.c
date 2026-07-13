@@ -1,17 +1,26 @@
 #include "dungeon.h"
+#define XXX false
+/* "XXX" is to be used as an if(XXX) clause, for "commenting" out code
+ * for debug reaons.
+ * */
+
+void exit(int);
 
 enum Error_Type dungeon_generate(struct Dungeon_Context *c)
 {
 	srand((unsigned int) time(NULL));
 	union Tile_Type wall_tile = {
-		.symbol = '#',
 		.flags = FL_NOMOVE,
 		.entity = 0,
 		.item = 0,
+		.room_id = DUNGEON_TILE_NO_ROOM,
+		.symbol = '#',
 	};
 	enum Error_Type res = dungeon_gen_filledslate(c, wall_tile);
-	if (res == E_OK)
-		res = dungeon_gen_rooms(c, MORIA_TRADITIONAL);
+	if (res == E_OK) {
+		res = dungeon_gen_rooms(c, DT_MORIA_TRADITIONAL);
+	} else { ; /* Fall through to return res logic. */ }
+	//dungeon_place_corridor(c, DUNGEON_TILE_NO_ROOM, 5, 5, 30, 35);
 	return res;
 }
 
@@ -20,22 +29,36 @@ enum Error_Type dungeon_gen_rooms(struct Dungeon_Context *c, enum Dungeon_Type d
 {
 	//struct Dungeon_Build_Graph = dungeon_gen_build_graph(c);
 	switch (dt) {
-	case MORIA_TRADITIONAL:
+	case DT_UNUSED: //swapped out for MORIA_TRADITIONAL
 		uint16_t placement_failures = 0;
 		uint8_t placed_rooms = 0;
-		while (placement_failures < PLACEMENT_MAX_ATTEMPTS && placed_rooms < PLACEMENT_MAX_ROOMS) {
+		while (placement_failures < PLACEMENT_MAX_ATTEMPTS
+		&& placed_rooms < PLACEMENT_MAX_ROOMS) {
 			uint32_t corner_A_x = (uint32_t) rand() % c->width;
 			uint32_t corner_A_y = (uint32_t) rand() % c->height;
 			uint32_t corner_B_x = (uint32_t) rand() % c->width;
 			uint32_t corner_B_y = (uint32_t) rand() % c->height;
-			if (
-				//Ugly hack using placed_rooms as the room ID here... XXX
-				dungeon_place_moria_room(c, placed_rooms, corner_A_x, corner_A_y, corner_B_x, corner_B_y)
-				== E_OK
-			) { ++placed_rooms; }
+			if (dungeon_place_moria_room(
+				c,//Ugly hack using placed_rooms as the room ID here. TODO 
+				placed_rooms,
+				corner_A_x,
+				corner_A_y,
+				corner_B_x,
+				corner_B_y
+			) == E_OK) { ++placed_rooms; }
 			else ++placement_failures;
 		}
 	break;
+	case DT_MORIA_TRADITIONAL:
+		if (dungeon_place_moria_room_two(c, 0, 40, 30) != E_OK) {
+			return E_FATAL;
+		} else {
+			if (dungeon_place_moria_room_two(c, 1, 20, 10) != E_OK)
+				return E_FATAL;
+			dungeon_place_corridor(c, DUNGEON_TILE_NO_ROOM, 40, 30, 20, 10);
+			return E_OK;
+		}
+		break; //unreachable / unnecessary break;
 	default:
 		return E_UNIMPLEMENTED;
 	}
@@ -52,12 +75,116 @@ enum Error_Type dungeon_dump_to_file(struct Dungeon_Context *c, char *filename)
 		if (i % c->width == 0) fputc('\n', fp);
 		fputc((c->tile_array + i)->symbol, fp);
 	}
-	if (fclose(fp) == 0)
-		return E_OK;
-	else
-		return E_OS;
+	if (fclose(fp) == 0) return E_OK;
+	else return E_OS;
 }
 
+/* Places a corridor between two designated points.
+ * Currently uses a naive approach of simply taking the most direct line to
+ * the destination, which results in jagged diagonal paths most of the time.
+ *
+ * TODO - rework so that it is more "L-shaped", having longer straight
+ * sections.
+ *
+ * */
+void dungeon_place_corridor(
+	struct Dungeon_Context *c,
+	uint8_t corridor_id, //Note: not sure if I will end up using this.
+	uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2
+) {
+	uint32_t x = x1, y = y1;
+	while (x != x2 || y != y2) {
+		*(c->tile_array + y * c->width + x) = (union Tile_Type) {
+			.flags = 0, .entity = 0, .symbol = '.',
+			.room_id = ((c->tile_array + y * c->width + x)->room_id
+				== DUNGEON_TILE_NO_ROOM) ? corridor_id
+				: (c->tile_array + y * c->width + x)->room_id
+		};
+		uint32_t x_diff = (x2 >= x) ? (x2 - x) : (x - x2);
+		uint32_t y_diff = (y2 >= y) ? (y2 - y) : (y - y2);
+		if ( x_diff > y_diff ) {
+			if (x > x2) { x -= 1; }
+			else { x += 1; }
+		} else {
+			if (y > y2) { y -= 1; }
+			else { y += 1; }
+		}
+	}
+	return;
+}
+
+enum Error_Type dungeon_place_moria_room_two(
+	struct Dungeon_Context *c,
+	uint8_t room_id,
+	uint32_t x,
+	uint32_t y
+) {
+#define DUNGEON_ROOM_TILE_TARGET 40
+#define DUNGEON_ROOM_TILE_JITTER 30
+	if (x >= c->width || y >= c->height) {
+		fprintf(stderr,
+		"dungeon_place_moria_room_two input out of bounds: x=%d  y=%d\n",x,y);
+		return E_FATAL;
+	}
+	//Going with hardcoded room "size target" for now.
+	uint32_t tiles_in_room = 0;
+	//Just check to make sure the one tile is not occupied by another room. TODO - check
+	//more "around" the target area as well.
+	if ((c->tile_array + y * c->width + x)->room_id != DUNGEON_TILE_NO_ROOM) {
+		if (XXX) {fprintf(stderr, "tile arr room val was not expected val: %d\n",
+				(c->tile_array + y * c->width + x)->room_id);
+			fprintf(stderr, "symbol:%c, entity:%d, item:%d, flags:%d\n",
+			(c->tile_array + y * c->width + x)->symbol,
+			(c->tile_array + y * c->width + x)->entity,
+			(c->tile_array + y * c->width + x)->item,
+			(c->tile_array + y * c->width + x)->flags
+		); }
+
+
+		return E_NONFATAL;
+	}
+	uint32_t target_size = (uint32_t) (DUNGEON_ROOM_TILE_TARGET
+	+ (rand() % DUNGEON_ROOM_TILE_JITTER));
+	uint32_t corner_A_x = x, corner_A_y = y, corner_B_x = x, corner_B_y = y;
+	if (!XXX) {
+		char buf[32];
+		snprintf(buf, 32, "target_size=%u", target_size);
+		log_message(LOG_MSG, buf);
+	}
+	while (tiles_in_room < target_size) {
+		switch (rand() % 4) {
+		case 0:
+			corner_A_x = (corner_A_x == 0) ? corner_A_x : corner_A_x - 1;
+			break;
+		case 1:
+			corner_B_x = (corner_B_x >= (uint32_t) (c->width - 1))
+			? corner_B_x : corner_B_x + 1;
+			break;
+		case 2:
+			corner_A_y = (corner_A_y == 0) ? corner_A_y : corner_A_y - 1;
+			break;
+		case 3:
+			corner_B_y = (corner_B_y >= (uint32_t) (c->height - 1))
+			? corner_B_y : corner_B_y + 1;
+			break;
+		default:
+			//UNREACHABLE
+			log_message(LOG_ERROR,
+			"dungeon.c : dungeon_place_moria_room_two : unreachable code reached\n");
+		}
+		tiles_in_room = (corner_B_x - corner_A_x) * (corner_B_y - corner_A_y);
+	}
+	if (!XXX) {char buf[32];
+		snprintf(buf, 32, "tiles_in_room=%u", tiles_in_room);
+		log_message(LOG_MSG, buf);
+	}
+
+	return dungeon_place_moria_room(c, room_id, corner_A_x, corner_A_y, corner_B_x, corner_B_y);
+
+#undef DUNGEON_ROOM_TILE_TARGET
+#undef DUNGEON_ROOM_TILE_JITTER
+//# defines scoped to this function only - for sanity
+}
 
 //Might not be the best to go about placing individual rooms like this.
 //How about dungeon_generate_graph() instead, which creates an abstract
@@ -175,7 +302,7 @@ enum Error_Type dungeon_place_moria_room (
 		*(c->tile_array + i * c->width + end_x) = blank_floor;
 	}*/
 	
-	end_y++;
+	end_y++; // ??? what are these two lines here for???
 	start_y = end_y;
 
 	return E_OK;

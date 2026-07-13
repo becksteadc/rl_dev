@@ -14,6 +14,8 @@ enum Error_Type {
     E_OK = 0, //No error
     E_DISPLAY, //An unspecified display error occurred - display_errno
     E_FATAL, //Unspecified fatal error that should terminate the application safely fatal_errno
+	E_NONFATAL, //Unspecified nonfatal error. The erroring function failed for some reason outside
+				//the bounds of the other enum error definitions.
     E_OS, //Errors returned by the OS or C standard library (Check errno)
 	E_UNIMPLEMENTED,
 

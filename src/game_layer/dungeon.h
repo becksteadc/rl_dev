@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "../platform_curses/display.h"
 #include "error_defs.h"
+#include "log.h"
 
 #define DUNGEON_MAX_WIDTH 1024
 #define DUNGEON_MAX_HEIGHT 512
@@ -16,7 +17,8 @@
 #define PLACEMENT_MAX_ROOMS 5
 
 enum Dungeon_Type {
-    MORIA_TRADITIONAL, //Mostly square rooms (maybe eventually support limited special - tile vaults...)
+    DT_MORIA_TRADITIONAL, //Mostly square rooms (maybe eventually support limited special - tile vaults...)
+	DT_UNUSED,
 };
 
 enum Dungeon_Flags {
@@ -36,14 +38,16 @@ struct {
 union Tile_Type {
     uint64_t raw;
     struct {
-        uint8_t flags; //may end up being too small - Could be clever, and handle this like old SNES palettes: only have 8 possible flags, but have the meaning of those flags depend on a different context (set per-screen in SNES, / set per level here. -- Doesn't have to be per level, could also be per "chunk" of a level if needed...)
+        uint8_t flags; //bit map of tile flags; May end up being too small - Could be clever, and handle this like old SNES palettes: only have 8 possible flags, but have the meaning of those flags depend on a different context (set per-screen in SNES, / set per level here. -- Doesn't have to be per level, could also be per "chunk" of a level if needed...)
         uint16_t item; //A handle into a global item list
         uint16_t entity; //A handle into a global entity list -> 65536 possible concurrent entities should be more than enough. //? - is it good to have entity referenced from a tile? Or is keeping that in sync with global entity lists going to be a pain?
         uint8_t symbol; //ASCII symbol this tile is represented by
 		uint8_t room_id; //Can tag a tile as part of a larger "room" or "collection" of tiles
+						 //255 is reserved as a "non-value"
         uint8_t reserved;
     };
 };
+#define DUNGEON_TILE_NO_ROOM 255
 
 struct Dungeon_Room {
 	uint8_t id;
@@ -85,11 +89,18 @@ void dungeon_display(struct Dungeon_Context *c);
 void dungeon_dealloc(struct Dungeon_Context *c);
 uint32_t dungeon_yx_to_offset(struct Dungeon_Context *c, uint16_t y, uint16_t x);
 void dungeon_debug_build_graph(struct Dungeon_Build_Graph *bg);
-enum Error_Type dungeon_gen_filledslate(struct Dungeon_Context *c, union Tile_Type fill_tile);
+enum Error_Type dungeon_gen_filledslate(struct Dungeon_Context *c,
+	union Tile_Type fill_tile);
 
-enum Error_Type dungeon_place_moria_room (struct Dungeon_Context *c, uint8_t room_number, uint32_t corner_A_x, uint32_t corner_A_y, uint32_t corner_B_x, uint32_t corner_B_y);
+enum Error_Type dungeon_place_moria_room (struct Dungeon_Context *c,
+	uint8_t room_number, uint32_t corner_A_x, uint32_t corner_A_y,
+	uint32_t corner_B_x, uint32_t corner_B_y);
+enum Error_Type dungeon_place_moria_room_two(struct Dungeon_Context *c,
+	uint8_t room_id, uint32_t x, uint32_t y);
 enum Error_Type dungeon_dump_to_file(struct Dungeon_Context *c, char *filename);
 
+void dungeon_place_corridor(struct Dungeon_Context *c, uint8_t corridor_id,
+	uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
 //TODO - this will be moved to another source file
 int weighted_random(uint8_t *weights, uint8_t weight_count);
 
